@@ -48,4 +48,13 @@ public class Customer {
   public void setCurrentOrder(Order currentOrder) {
     this.currentOrder = currentOrder;
   }
+
+  public void advaceToNextTask() {
+    if (currentTask != null) {
+      currentTask.advanceToNextTaskType();
+      if (currentTask.isCompleted()) {
+        currentTask = null; // No more tasks for this customer
+      }
+    }
+  }
 }

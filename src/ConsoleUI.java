@@ -6,7 +6,8 @@ public class ConsoleUI {
 
     public void showGameIntro(int turns) {
         System.out.println("Welcome to the Restaurant Management Game!");
-        System.out.println("You are the manager of a restaurant, and your goal is to serve customers efficiently and maximize revenue.");
+        System.out.println(
+                "You are the manager of a restaurant, and your goal is to serve customers efficiently and maximize revenue.");
         System.out.println("You will have a limited number of turns to manage your staff and serve customers.");
         System.out.println("\nObjective by the end of turn " + turns + ":");
         System.out.println(" - At least 4 paid customers");
@@ -37,7 +38,7 @@ public class ConsoleUI {
             }
         }
 
-        //Display occupied tables
+        // Display occupied tables
         System.out.println("Occupied tables:");
         boolean hasOccupiedTable = false;
         for (int i = 0; i < tables.length; i++) {
@@ -73,7 +74,7 @@ public class ConsoleUI {
                         + ", order=" + orderStatus);
             }
         }
-        
+
         // Display available tasks for staff
         System.out.println("Staff tasks available:");
         if (availableTasks.isEmpty()) {
@@ -110,4 +111,20 @@ public class ConsoleUI {
             System.out.println("Please enter a number from " + min + " to " + max + ".");
         }
     }
+
+    public int getWaiterTaskChoice() {
+        Scanner input = new Scanner(System.in);
+        System.out.println("You are now the waiter!");
+        System.out.println("0. Wait (skip this turn)");
+        System.out.println("1. Seat a customer");
+        System.out.println("2. Take an order");
+        System.out.println("3. Serve a dish");
+        System.out.println("4. Process payment");
+        System.out.println("Enter the number of the task you want to perform:");
+        int taskChoice = input.nextInt();
+        input.close();
+        return taskChoice;
+    }
+
+    
 }
