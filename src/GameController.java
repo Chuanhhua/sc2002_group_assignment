@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class GameController {
     private final int maxTurns;
@@ -95,6 +96,78 @@ public class GameController {
             }
             consoleUI.showTurnStatus(turn, totalRevenue, getAveragePaidSatisfactionScore(),
                     waitingCustomers, tables, allCustomers, getAllPendingsTasks());
+            
+            int taskChoice = consoleUI.getWaiterTaskChoice();
+            boolean isWaiterTasked = false;
+            while (isWaiterTasked){
+                switch (taskChoice) {
+                    case 0:
+                        // Wait (skip this turn)
+                        break;
+                    case 1:
+                        // Seat a customer
+                        if (!waitingCustomers.isEmpty()) {
+                            for (Table table : tables) {
+                                if (!table.isOccupied()) {
+                                    Customer customerToSeat = waitingCustomers.get(0);
+                                    table.occupyTable(customerToSeat);
+                                    customerToSeat.advaceToNextTask();
+                                    isWaiterTasked = true;
+                                    waitingCustomers.remove(0);
+                                    System.out.println("Customer " + customerToSeat.getCustomerId() + " has been seated.");
+                                    break;
+                                }
+                            }
+                            if (!isWaiterTasked) {
+                                System.out.println("No available tables to seat the customer.");
+                            }
+                        } else {
+                            System.out.println("No customers are waiting to be seated.");
+                        }
+                        break;
+                    case 2:
+                        // Take an order
+                        for (Table table : tables) {
+                            if (table.isOccupied() && table.getCustomer().getCurrentTask() == null) {
+                                Order order = new Order(table.getCustomer(), menu);
+                                allOrders.add(order);
+                                table.getCustomer().setCurrentTask(new Task(Task.TaskType.TAKE_ORDER));
+                                break;
+                            }
+                        }
+                        break;
+                    case 3:
+                        // Serve a dish
+                        for (Chef chef : chefs) {
+                            if (chef.hasPreparedDish()) {
+                                Order orderToServe = chef.getPreparedOrder();
+                                for (Table table : tables) {
+                                    if (table.isOccupied() && table.getCustomer().equals(orderToServe.getCustomer())) {
+                                        table.getCustomer().setCurrentTask(new Task(Task.TaskType.SERVE_ORDER));
+                                        chef.clearPreparedOrder();
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                        break;
+                    case 4:
+                        // Process payment
+                        for (Table table : tables) {
+                            if (table.isOccupied() && table.getCustomer().getCurrentTask() == null) {
+                                double paymentAmount = table.getCustomer().getTotalBill();
+                                totalRevenue += paymentAmount;
+                                table.getCustomer().setPaid(true);
+                                table.clearTable();
+                                break;
+                            }
+                        }
+                        break;
+                    default:
+                        System.out.println("Invalid choice. Please try again.");
+                }
+            }
         }
     }
 

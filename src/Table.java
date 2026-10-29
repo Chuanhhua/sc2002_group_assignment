@@ -11,7 +11,7 @@ public class Table {
     return isOccupied;
   }
 
-  public void occupyTable(Customer customer, Order order) {
+  public void occupyTable(Customer customer) {
     this.isOccupied = true;
     this.currentCustomer = customer;
   }
