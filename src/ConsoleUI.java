@@ -6,8 +6,7 @@ public class ConsoleUI {
 
     public void showGameIntro(int turns) {
         System.out.println("Welcome to the Restaurant Management Game!");
-        System.out.println(
-                "You are the manager of a restaurant, and your goal is to serve customers efficiently and maximize revenue.");
+        System.out.println("You are the manager of a restaurant, and your goal is to serve customers efficiently and maximize revenue.");
         System.out.println("You will have a limited number of turns to manage your staff and serve customers.");
         System.out.println("\nObjective by the end of turn " + turns + ":");
         System.out.println(" - At least 4 paid customers");
