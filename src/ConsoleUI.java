@@ -4,14 +4,15 @@ import java.util.List;
 public class ConsoleUI {
     private final Scanner scanner = new Scanner(System.in);
 
-    public void showGameIntro(int turns) {
+    public void showGameIntro(int turns, int requiredPaidCustomers, double requiredRevenue,
+            double requiredAverageSatisfaction) {
         System.out.println("Welcome to the Restaurant Management Game!");
         System.out.println("You are the manager of a restaurant, and your goal is to serve customers efficiently and maximize revenue.");
         System.out.println("You will have a limited number of turns to manage your staff and serve customers.");
         System.out.println("\nObjective by the end of turn " + turns + ":");
-        System.out.println(" - At least 4 paid customers");
-        System.out.println(" - Revenue of at least $45");
-        System.out.println(" - Average satisfaction of paid customers of at least 60");
+        System.out.println(" - At least " + requiredPaidCustomers + " paid customers");
+        System.out.printf(" - Revenue of at least $%.0f%n", requiredRevenue);
+        System.out.printf(" - Average satisfaction of paid customers of at least %.0f%n", requiredAverageSatisfaction);
         System.out.println("Good luck!");
     }
 
@@ -21,7 +22,7 @@ public class ConsoleUI {
     }
 
     public void showTurnStatus(int turn, double revenue, double averagePaidSatisfaction,
-            List<Customer> waitingCustomers, Table[] tables, List<Customer> customers, List<Task> availableTasks) {
+            List<Customer> waitingCustomers, Table[] tables, List<Customer> customers) {
         // Display the turn number, revenue, average satisfaction
         showTurnStart(turn);
         System.out.printf("Revenue: $%.2f%n", revenue);
@@ -60,6 +61,8 @@ public class ConsoleUI {
                 String orderStatus;
                 if (order == null) {
                     orderStatus = "No order";
+                } else if (order.isPaid()) {
+                    orderStatus = "Paid";
                 } else if (order.isServed()) {
                     orderStatus = "Served";
                 } else if (order.isPrepared()) {
@@ -76,17 +79,61 @@ public class ConsoleUI {
 
         // Display available tasks for staff
         System.out.println("Staff tasks available:");
-        if (availableTasks.isEmpty()) {
-            System.out.println("  None");
-        } else {
-            for (Task task : availableTasks) {
-                System.out.println("  " + task);
+        boolean hasPendingTask = false;
+        for (Customer customer : customers) {
+            Task task = customer.getCurrentTask();
+            if (task != null && !task.isCompleted()) {
+                hasPendingTask = true;
+                System.out.println("  Customer " + customer.getCustomerId() + ": " + task);
             }
+        }
+        if (!hasPendingTask) {
+            System.out.println("  None");
         }
     }
 
     public void showTurnEnd(int turn) {
         System.out.println("----- End of turn " + turn + " -----");
+    }
+
+    public void showGameSummary(int turns, List<Customer> customers, double revenue, int paidCustomerCount,
+            double averagePaidSatisfaction, int requiredPaidCustomers, double requiredRevenue,
+            double requiredAverageSatisfaction) {
+        System.out.println();
+        System.out.println("========== Game Summary ==========");
+        System.out.println("Turns played: " + turns);
+        System.out.println("Customers arrived: " + customers.size());
+
+        System.out.println("Customers:");
+        if (customers.isEmpty()) {
+            System.out.println("  None");
+        }
+        for (Customer customer : customers) {
+            Order order = customer.getCurrentOrder();
+            Task task = customer.getCurrentTask();
+            String status;
+            if (customer.isPaid()) {
+                status = String.format("Paid $%.2f for %s", order.getTotalPrice(), order.getMenuItem().getItemName());
+            } else if (task != null) {
+                status = "Unpaid, " + task.toString().toLowerCase();
+            } else {
+                status = "Unpaid";
+            }
+            System.out.println("  Customer " + customer.getCustomerId() + ": " + status
+                    + ", satisfaction=" + customer.getSatisfactionScore());
+        }
+
+        System.out.println("Objectives:");
+        System.out.println("  Paid customers: " + paidCustomerCount + " / " + requiredPaidCustomers
+                + objectiveStatus(paidCustomerCount >= requiredPaidCustomers));
+        System.out.printf("  Revenue: $%.2f / $%.2f%s%n", revenue, requiredRevenue,
+                objectiveStatus(revenue >= requiredRevenue));
+        System.out.printf("  Average satisfaction of paid customers: %.2f / %.2f%s%n", averagePaidSatisfaction,
+                requiredAverageSatisfaction, objectiveStatus(averagePaidSatisfaction >= requiredAverageSatisfaction));
+    }
+
+    private String objectiveStatus(boolean isMet) {
+        return isMet ? " [MET]" : " [NOT MET]";
     }
 
     public void showFinalResult(boolean victory) {
@@ -112,17 +159,55 @@ public class ConsoleUI {
     }
 
     public int getWaiterTaskChoice() {
-        Scanner input = new Scanner(System.in);
         System.out.println("You are now the waiter!");
         System.out.println("0. Wait (skip this turn)");
         System.out.println("1. Seat a customer");
         System.out.println("2. Take an order");
         System.out.println("3. Serve a dish");
-        System.out.println("4. Process payment");
-        System.out.println("Enter the number of the task you want to perform:");
-        int taskChoice = input.nextInt();
-        input.close();
-        return taskChoice;
+        // Reuse the shared scanner; closing a Scanner on System.in would break later input
+        return promptInt("Enter the number of the task you want to perform: ", 0, 3);
+    }
+
+    // Returns the index of the chosen table, only accepting tables in eligibleTables.
+    // action describes what the waiter is doing, e.g. "take the order from"
+    public int getTableChoice(Table[] tables, List<Integer> eligibleTables, String action) {
+        System.out.println("Tables available to " + action + ":");
+        for (int index : eligibleTables) {
+            System.out.println("  Table " + (index + 1) + ": " + tables[index]);
+        }
+        while (true) {
+            int tableNumber = promptInt("Enter the table number to " + action + ": ", 1, tables.length);
+            if (eligibleTables.contains(tableNumber - 1)) {
+                return tableNumber - 1;
+            }
+            System.out.println("Cannot " + action + " Table " + tableNumber + ".");
+        }
+    }
+
+    // Returns the index of the chosen order in orders; customers[i] is the customer who placed orders[i].
+    // action describes what is being done to the order, e.g. "serve"
+    public int getOrderChoice(List<Order> orders, List<Customer> customers, String action) {
+        System.out.println("Orders available to " + action + ":");
+        for (int i = 0; i < orders.size(); i++) {
+            Order order = orders.get(i);
+            String line = "  " + (i + 1) + ". Customer " + customers.get(i).getCustomerId() + ": "
+                    + order.getMenuItem().getItemName();
+            if (!order.isPrepared()) {
+                line += " (" + order.getRemainingPreparationUnits() + " units remaining)";
+            }
+            System.out.println(line);
+        }
+        return promptInt("Enter the number of the order to " + action + ": ", 1, orders.size()) - 1;
+    }
+
+    // Pauses until the player presses Enter
+    public void waitForEnter(String prompt) {
+        System.out.print(prompt);
+        scanner.nextLine();
+    }
+
+    public void showChefTurn(int chefNumber) {
+        System.out.println("You are now Chef " + chefNumber + "!");
     }
 
     
