@@ -75,15 +75,13 @@ public class GameController {
         return paidCustomerCount > 0 ? (double) totalScore / paidCustomerCount : 0.0;
     }
 
-    public List<Task> getAllPendingsTasks() {
-        List<Task> pendingTasks = new ArrayList<>();
+    private Customer findCustomerByOrder(Order order) {
         for (Customer customer : allCustomers) {
-            Task task = customer.getCurrentTask();
-            if (task != null && !task.isCompleted()) {
-                pendingTasks.add(task);
+            if (customer.getCurrentOrder() == order) {
+                return customer;
             }
         }
-        return pendingTasks;
+        return null;
     }
 
     public void run() {
@@ -95,14 +93,16 @@ public class GameController {
                 waitingCustomers.add(customer);
             }
             consoleUI.showTurnStatus(turn, totalRevenue, getAveragePaidSatisfactionScore(),
-                    waitingCustomers, tables, allCustomers, getAllPendingsTasks());
+                    waitingCustomers, tables, allCustomers);
             
-            int taskChoice = consoleUI.getWaiterTaskChoice();
+            // Keep asking until the waiter performs a valid task, so the turn only advances then
             boolean isWaiterTasked = false;
-            while (isWaiterTasked){
+            while (!isWaiterTasked) {
+                int taskChoice = consoleUI.getWaiterTaskChoice();
                 switch (taskChoice) {
                     case 0:
                         // Wait (skip this turn)
+                        isWaiterTasked = true;
                         break;
                     case 1:
                         // Seat a customer
@@ -127,47 +127,139 @@ public class GameController {
                         break;
                     case 2:
                         // Take an order
-                        for (Table table : tables) {
-                            if (table.isOccupied() && table.getCustomer().getCurrentTask() == null) {
-                                Order order = new Order(table.getCustomer(), menu);
-                                allOrders.add(order);
-                                table.getCustomer().setCurrentTask(new Task(Task.TaskType.TAKE_ORDER));
-                                break;
+                        List<Integer> tablesReadyToOrder = new ArrayList<>();
+                        for (int i = 0; i < tables.length; i++) {
+                            if (tables[i].isOccupied()) {
+                                Task task = tables[i].getCurrentCustomer().getCurrentTask();
+                                if (task != null && task.getTaskType() == Task.TaskType.TAKE_ORDER) {
+                                    tablesReadyToOrder.add(i);
+                                }
                             }
                         }
+                        if (tablesReadyToOrder.isEmpty()) {
+                            System.out.println("No occupied tables are waiting to order.");
+                            break;
+                        }
+                        int tableIndex = consoleUI.getTableChoice(tables, tablesReadyToOrder, "take the order from");
+                        Customer orderingCustomer = tables[tableIndex].getCurrentCustomer();
+                        // The customer picks their dish at random; every order contains exactly 1 of it
+                        MenuItem orderedItem = menu.getRandomMenuItem();
+                        Order order = new Order(orderedItem, 1);
+                        allOrders.add(order);
+                        // Attach the order before advancing so PREPARE_ORDER picks up its preparation units
+                        orderingCustomer.setCurrentOrder(order);
+                        orderingCustomer.advaceToNextTask();
+                        isWaiterTasked = true;
+                        System.out.println("Order taken from Customer " + orderingCustomer.getCustomerId() + " at Table "
+                                + (tableIndex + 1) + ": " + orderedItem.getItemName() + ".");
                         break;
                     case 3:
                         // Serve a dish
-                        for (Chef chef : chefs) {
-                            if (chef.hasPreparedDish()) {
-                                Order orderToServe = chef.getPreparedOrder();
-                                for (Table table : tables) {
-                                    if (table.isOccupied() && table.getCustomer().equals(orderToServe.getCustomer())) {
-                                        table.getCustomer().setCurrentTask(new Task(Task.TaskType.SERVE_ORDER));
-                                        chef.clearPreparedOrder();
-                                        break;
-                                    }
-                                }
-                                break;
+                        List<Order> preparedOrders = new ArrayList<>();
+                        for (Order existingOrder : allOrders) {
+                            if (existingOrder.isPrepared() && !existingOrder.isServed()) {
+                                preparedOrders.add(existingOrder);
                             }
                         }
-                        break;
-                    case 4:
-                        // Process payment
-                        for (Table table : tables) {
-                            if (table.isOccupied() && table.getCustomer().getCurrentTask() == null) {
-                                double paymentAmount = table.getCustomer().getTotalBill();
-                                totalRevenue += paymentAmount;
-                                table.getCustomer().setPaid(true);
-                                table.clearTable();
-                                break;
-                            }
+                        if (preparedOrders.isEmpty()) {
+                            System.out.println("No orders are ready to be served.");
+                            break;
                         }
+                        List<Customer> preparedOrderCustomers = new ArrayList<>();
+                        for (Order preparedOrder : preparedOrders) {
+                            preparedOrderCustomers.add(findCustomerByOrder(preparedOrder));
+                        }
+                        int orderIndex = consoleUI.getOrderChoice(preparedOrders, preparedOrderCustomers, "serve");
+                        Order orderToServe = preparedOrders.get(orderIndex);
+                        Customer servedCustomer = preparedOrderCustomers.get(orderIndex);
+                        orderToServe.setServed(true);
+                        orderToServe.setServedTurn(turn);
+                        servedCustomer.advaceToNextTask();
+                        isWaiterTasked = true;
+                        System.out.println("Served " + orderToServe.getMenuItem().getItemName() + " to Customer "
+                                + servedCustomer.getCustomerId() + ".");
                         break;
                     default:
                         System.out.println("Invalid choice. Please try again.");
                 }
             }
+
+            runChefPhase();
+            runCashierPhase(turn);
+            consoleUI.showTurnEnd(turn);
+        }
+    }
+
+    // Each chef picks one unprepared order and advances it by 1 preparation unit
+    private void runChefPhase() {
+        List<Order> ordersWorkedOn = new ArrayList<>();
+        for (int i = 0; i < chefs.length; i++) {
+            List<Order> ordersToPrepare = new ArrayList<>();
+            List<Customer> ordersToPrepareCustomers = new ArrayList<>();
+            for (Order existingOrder : allOrders) {
+                // Skip orders another chef already worked on this turn
+                if (!existingOrder.isPrepared() && !ordersWorkedOn.contains(existingOrder)) {
+                    ordersToPrepare.add(existingOrder);
+                    ordersToPrepareCustomers.add(findCustomerByOrder(existingOrder));
+                }
+            }
+            if (ordersToPrepare.isEmpty()) {
+                System.out.println("No orders are available to prepare.");
+                consoleUI.waitForEnter("Press Enter to continue...");
+                return;
+            }
+            consoleUI.showChefTurn(i + 1);
+            int orderIndex = consoleUI.getOrderChoice(ordersToPrepare, ordersToPrepareCustomers, "prepare");
+            Order orderToPrepare = ordersToPrepare.get(orderIndex);
+            Customer orderingCustomer = ordersToPrepareCustomers.get(orderIndex);
+            // The customer's PREPARE_ORDER task advances the order by 1 unit and moves to SERVE_ORDER when done
+            orderingCustomer.advaceToNextTask();
+            ordersWorkedOn.add(orderToPrepare);
+            if (orderToPrepare.isPrepared()) {
+                System.out.println(orderToPrepare.getMenuItem().getItemName() + " for Customer "
+                        + orderingCustomer.getCustomerId() + " is ready to be served.");
+            } else {
+                System.out.println("Prepared 1 unit of " + orderToPrepare.getMenuItem().getItemName()
+                        + " for Customer " + orderingCustomer.getCustomerId() + " ("
+                        + orderToPrepare.getRemainingPreparationUnits() + " units remaining).");
+            }
+        }
+    }
+
+    // Each cashier automatically takes payment from the oldest customer who finished eating.
+    // A customer served in turn T eats during turn T + 1 and can only pay from turn T + 2.
+    private void runCashierPhase(int turn) {
+        for (int i = 0; i < cashiers.length; i++) {
+            Customer payingCustomer = null;
+            // allCustomers is in arrival order, so the first match is the oldest customer
+            for (Customer customer : allCustomers) {
+                Order order = customer.getCurrentOrder();
+                if (!customer.isPaid() && order != null && order.isServed() && turn - order.getServedTurn() >= 2) {
+                    payingCustomer = customer;
+                    break;
+                }
+            }
+            if (payingCustomer == null) {
+                System.out.println("No customers are ready to pay.");
+                consoleUI.waitForEnter("Press Enter to continue...");
+                return;
+            }
+            consoleUI.waitForEnter("Customer " + payingCustomer.getCustomerId()
+                    + " is ready to pay. Press Enter to process payment...");
+            Order paidOrder = payingCustomer.getCurrentOrder();
+            double paymentAmount = paidOrder.getTotalPrice();
+            totalRevenue += paymentAmount;
+            payingCustomer.setPaid(true);
+            paidOrder.setPaid(true);
+            payingCustomer.advaceToNextTask();
+            for (Table table : tables) {
+                if (table.getCurrentCustomer() == payingCustomer) {
+                    table.vacateTable();
+                    break;
+                }
+            }
+            System.out.printf("Cashier processed payment of $%.2f from Customer %d.%n", paymentAmount,
+                    payingCustomer.getCustomerId());
         }
     }
 

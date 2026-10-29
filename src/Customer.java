@@ -47,6 +47,14 @@ public class Customer {
 
   public void setCurrentOrder(Order currentOrder) {
     this.currentOrder = currentOrder;
+    this.isOrderTaken = currentOrder != null;
+    if (currentTask != null) {
+      currentTask.setOrder(currentOrder);
+    }
+  }
+
+  public boolean isOrderTaken() {
+    return isOrderTaken;
   }
 
   public void advaceToNextTask() {

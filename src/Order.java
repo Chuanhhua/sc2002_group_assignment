@@ -4,12 +4,16 @@ public class Order {
   private int remainingPreparationUnits;
   private boolean isServed;
   private boolean isPrepared;
+  private boolean isPaid;
+  private int servedTurn;
 
   public Order(MenuItem menuItem, int quantity) {
     this.menuItem = menuItem;
     this.quantity = quantity;
     this.isServed = false;
     this.isPrepared = false;
+    this.isPaid = false;
+    this.servedTurn = -1;
     this.remainingPreparationUnits = menuItem.getPreparationUnits() * quantity;
   }
 
@@ -31,6 +35,26 @@ public class Order {
 
   public void setServed(boolean served) {
     isServed = served;
+  }
+
+  public boolean isPaid() {
+    return isPaid;
+  }
+
+  public void setPaid(boolean paid) {
+    isPaid = paid;
+  }
+
+  public int getServedTurn() {
+    return servedTurn;
+  }
+
+  public void setServedTurn(int servedTurn) {
+    this.servedTurn = servedTurn;
+  }
+
+  public double getTotalPrice() {
+    return menuItem.getPrice() * quantity;
   }
 
   public int getRemainingPreparationUnits() {

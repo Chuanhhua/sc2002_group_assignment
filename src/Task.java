@@ -47,6 +47,14 @@ public class Task {
     return taskType;
   }
 
+  public Order getOrder() {
+    return order;
+  }
+
+  public void setOrder(Order order) {
+    this.order = order;
+  }
+
   public void advanceToNextTaskType() {
     // If the task is already completed, we don't need to advance to the next task
     // type
@@ -100,9 +108,19 @@ public class Task {
   }
 
   public String toString() {
-    return "Task{" +
-        "taskType=" + taskType +
-        ", isCompleted=" + isCompleted +
-        '}';
+    switch (taskType) {
+      case SEAT_CUSTOMER:
+        return "Waiting to be seated";
+      case TAKE_ORDER:
+        return "Ready to order";
+      case PREPARE_ORDER:
+        return "Order being prepared (" + preparationUnitsRemaining + " units remaining)";
+      case SERVE_ORDER:
+        return "Order ready to be served";
+      case PROCESS_PAYMENT:
+        return "Eating, then paying";
+      default:
+        return taskType.toString();
+    }
   }
 }
