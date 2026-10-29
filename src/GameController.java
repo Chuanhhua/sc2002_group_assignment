@@ -3,6 +3,11 @@ import java.util.List;
 import java.util.Scanner;
 
 public class GameController {
+    // Objectives the player must meet by the end of the last turn to win
+    private static final int REQUIRED_PAID_CUSTOMERS = 4;
+    private static final double REQUIRED_REVENUE = 45.0;
+    private static final double REQUIRED_AVERAGE_SATISFACTION = 60.0;
+
     private final int maxTurns;
     private final Chef[] chefs;
     private final Waiter[] waiters;
@@ -75,6 +80,16 @@ public class GameController {
         return paidCustomerCount > 0 ? (double) totalScore / paidCustomerCount : 0.0;
     }
 
+    public int getPaidCustomerCount() {
+        int paidCustomerCount = 0;
+        for (Customer customer : allCustomers) {
+            if (customer.isPaid()) {
+                paidCustomerCount++;
+            }
+        }
+        return paidCustomerCount;
+    }
+
     private Customer findCustomerByOrder(Order order) {
         for (Customer customer : allCustomers) {
             if (customer.getCurrentOrder() == order) {
@@ -85,7 +100,7 @@ public class GameController {
     }
 
     public void run() {
-        consoleUI.showGameIntro(maxTurns);
+        consoleUI.showGameIntro(maxTurns, REQUIRED_PAID_CUSTOMERS, REQUIRED_REVENUE, REQUIRED_AVERAGE_SATISFACTION);
         for (int turn = 1; turn <= maxTurns; turn++) {
             if (turn <= 16 && (turn - 1) % 3 == 0) {
                 Customer customer = new Customer(allCustomers.size() + 1, 100);
@@ -188,6 +203,14 @@ public class GameController {
             runCashierPhase(turn);
             consoleUI.showTurnEnd(turn);
         }
+
+        int paidCustomerCount = getPaidCustomerCount();
+        double averagePaidSatisfaction = getAveragePaidSatisfactionScore();
+        consoleUI.showGameSummary(maxTurns, allCustomers, totalRevenue, paidCustomerCount, averagePaidSatisfaction,
+                REQUIRED_PAID_CUSTOMERS, REQUIRED_REVENUE, REQUIRED_AVERAGE_SATISFACTION);
+        boolean victory = paidCustomerCount >= REQUIRED_PAID_CUSTOMERS && totalRevenue >= REQUIRED_REVENUE
+                && averagePaidSatisfaction >= REQUIRED_AVERAGE_SATISFACTION;
+        consoleUI.showFinalResult(victory);
     }
 
     // Each chef picks one unprepared order and advances it by 1 preparation unit
