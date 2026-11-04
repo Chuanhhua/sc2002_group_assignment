@@ -51,30 +51,34 @@ public class ConsoleUI {
             System.out.println("  None");
         }
 
-        // Display order status
+        // Display order status; only customers who have placed an order are listed
         System.out.println("Orders:");
-        if (customers.isEmpty()) {
-            System.out.println("  None");
-        } else {
-            for (Customer customer : customers) {
-                Order order = customer.getCurrentOrder();
-                String orderStatus;
-                if (order == null) {
-                    orderStatus = "No order";
-                } else if (order.isPaid()) {
-                    orderStatus = "Paid";
-                } else if (order.isServed()) {
-                    orderStatus = "Served";
-                } else if (order.isPrepared()) {
-                    orderStatus = "Prepared";
-                } else {
-                    orderStatus = "Preparing (" + order.getRemainingPreparationUnits()
-                            + " units remaining)";
-                }
-                System.out.println("  Customer " + customer.getCustomerId()
-                        + ": satisfaction=" + customer.getSatisfactionScore()
-                        + ", order=" + orderStatus);
+        boolean hasOrder = false;
+        for (Customer customer : customers) {
+            Order order = customer.getCurrentOrder();
+            if (order == null) {
+                continue;
             }
+            hasOrder = true;
+            String orderStatus;
+            if (customer.hasLeft()) {
+                orderStatus = "Cancelled (left)";
+            } else if (order.isPaid()) {
+                orderStatus = "Paid";
+            } else if (order.isServed()) {
+                orderStatus = "Served";
+            } else if (order.isPrepared()) {
+                orderStatus = "Prepared";
+            } else {
+                orderStatus = "Preparing (" + order.getRemainingPreparationUnits()
+                        + " units remaining)";
+            }
+            System.out.println("  Customer " + customer.getCustomerId()
+                    + ": satisfaction=" + customer.getSatisfactionScore()
+                    + ", order=" + orderStatus);
+        }
+        if (!hasOrder) {
+            System.out.println("  None");
         }
 
         // Display available tasks for staff
@@ -112,7 +116,9 @@ public class ConsoleUI {
             Order order = customer.getCurrentOrder();
             Task task = customer.getCurrentTask();
             String status;
-            if (customer.isPaid()) {
+            if (customer.hasLeft()) {
+                status = "Left without paying";
+            } else if (customer.isPaid()) {
                 status = String.format("Paid $%.2f for %s", order.getTotalPrice(), order.getMenuItem().getItemName());
             } else if (task != null) {
                 status = "Unpaid, " + task.toString().toLowerCase();

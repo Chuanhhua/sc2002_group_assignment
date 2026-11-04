@@ -1,9 +1,12 @@
 public class Customer {
+  private static final int REGULAR_SATISFACTION_LOSS_PER_TURN = 8;
+
   private int customerId;
   private int satisfactionScore;
   private boolean isSeated;
   private boolean isOrderTaken;
   private boolean isPaid;
+  private boolean hasLeft;
   private Order currentOrder;
   private Task currentTask;
 
@@ -55,6 +58,33 @@ public class Customer {
 
   public boolean isOrderTaken() {
     return isOrderTaken;
+  }
+
+  public boolean hasLeft() {
+    return hasLeft;
+  }
+
+  // Satisfaction lost at the end of every turn spent waiting for service (Regular customer)
+  public int getSatisfactionLossPerTurn() {
+    return REGULAR_SATISFACTION_LOSS_PER_TURN;
+  }
+
+  // True while the customer is waiting to be seated, to order, or for their dish to be served.
+  // Customers who have been served (eating or ready to pay), paid, or left are not waiting.
+  public boolean isAwaitingService() {
+    return !hasLeft && !isPaid && currentTask != null
+        && currentTask.getTaskType() != Task.TaskType.PROCESS_PAYMENT;
+  }
+
+  // Applies the end-of-turn satisfaction loss, never going below 0
+  public void loseSatisfaction() {
+    satisfactionScore = Math.max(0, satisfactionScore - getSatisfactionLossPerTurn());
+  }
+
+  // The customer walks out without paying; they no longer have any task
+  public void leave() {
+    hasLeft = true;
+    currentTask = null;
   }
 
   public void advaceToNextTask() {
