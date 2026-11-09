@@ -1,9 +1,12 @@
 public class Customer {
+  private static final int REGULAR_SATISFACTION_LOSS_PER_TURN = 8;
+
   private int customerId;
   private int satisfactionScore;
   private boolean isSeated;
   private boolean isOrderTaken;
   private boolean isPaid;
+  private boolean hasLeft;
   private Order currentOrder;
   private Task currentTask;
 
@@ -56,6 +59,28 @@ public class Customer {
   public boolean isOrderTaken() {
     return isOrderTaken;
   }
+
+  public boolean hasLeft() {
+    return hasLeft;
+  }
+
+  public int getSatisfactionLossPerTurn() {
+    return REGULAR_SATISFACTION_LOSS_PER_TURN;
+  }
+
+  public boolean isAwaitingService() {
+    return !hasLeft && !isPaid && currentTask != null && currentTask.getTaskType() != Task.TaskType.PROCESS_PAYMENT;
+  }
+
+  public void loseSatisfaction() {
+    satisfactionScore = Math.max(0, satisfactionScore - getSatisfactionLossPerTurn());
+  }
+
+  public void leave() {
+    hasLeft = true;
+    currentTask = null;
+  }
+
 
   public void advaceToNextTask() {
     if (currentTask != null) {
