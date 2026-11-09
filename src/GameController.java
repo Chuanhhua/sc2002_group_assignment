@@ -9,9 +9,6 @@ public class GameController {
     private static final double REQUIRED_AVERAGE_SATISFACTION = 60.0;
 
     private final int maxTurns;
-    private final Chef[] chefs;
-    private final Waiter[] waiters;
-    private final Cashier[] cashiers;
     private final Menu menu;
     private final ConsoleUI consoleUI = new ConsoleUI();
     private double totalRevenue;
@@ -26,18 +23,6 @@ public class GameController {
         this.tables = new Table[noOfTables];
         for (int i = 0; i < tables.length; i++) {
             tables[i] = new Table();
-        }
-        this.chefs = new Chef[noOfChefs];
-        for (int i = 0; i < chefs.length; i++) {
-            chefs[i] = new Chef();
-        }
-        this.waiters = new Waiter[noOfWaiters];
-        for (int i = 0; i < waiters.length; i++) {
-            waiters[i] = new Waiter();
-        }
-        this.cashiers = new Cashier[noOfCashiers];
-        for (int i = 0; i < cashiers.length; i++) {
-            cashiers[i] = new Cashier();
         }
         this.menu = new Menu(menuSize);
     }
@@ -201,6 +186,7 @@ public class GameController {
 
             runChefPhase();
             runCashierPhase(turn);
+            runSatisfactionPhase();
             consoleUI.showTurnEnd(turn);
         }
 
@@ -283,6 +269,36 @@ public class GameController {
             }
             System.out.printf("Cashier processed payment of $%.2f from Customer %d.%n", paymentAmount,
                     payingCustomer.getCustomerId());
+        }
+    }
+
+    // At turn end, every waiting or seated customer who has not been served loses satisfaction.
+    // A customer who reaches 0 leaves without paying: their unfinished order is cancelled and
+    // their table is freed. Customers who are served, eating or ready to pay lose nothing.
+    private void runSatisfactionPhase() {
+        for (Customer customer : allCustomers) {
+            if (!customer.isAwaitingService()) {
+                continue;
+            }
+            customer.loseSatisfaction();
+            if (customer.getSatisfactionScore() > 0) {
+                continue;
+            }
+            customer.leave();
+            waitingCustomers.remove(customer);
+            Order unfinishedOrder = customer.getCurrentOrder();
+            if (unfinishedOrder != null) {
+                // Removing it stops chefs from preparing it and waiters from serving it
+                allOrders.remove(unfinishedOrder);
+            }
+            for (Table table : tables) {
+                if (table.getCurrentCustomer() == customer) {
+                    table.vacateTable();
+                    break;
+                }
+            }
+            System.out.println("Customer " + customer.getCustomerId()
+                    + " ran out of patience and left without paying.");
         }
     }
 
