@@ -8,6 +8,10 @@ public class GameController {
     private static final double REQUIRED_REVENUE = 45.0;
     private static final double REQUIRED_AVERAGE_SATISFACTION = 60.0;
 
+    private final int noOfChefs;
+    private final int noOfWaiters;
+    private final int noOfCashiers;
+
     private final int maxTurns;
     private final Menu menu;
     private final ConsoleUI consoleUI = new ConsoleUI();
@@ -19,6 +23,11 @@ public class GameController {
 
     public GameController(int maxTurns, int noOfTables, int noOfChefs, int noOfWaiters, int noOfCashiers,
             int menuSize) {
+
+        this.noOfChefs = noOfChefs;
+        this.noOfWaiters = noOfWaiters;
+        this.noOfCashiers = noOfCashiers;
+
         this.maxTurns = maxTurns;
         this.tables = new Table[noOfTables];
         for (int i = 0; i < tables.length; i++) {
@@ -202,7 +211,7 @@ public class GameController {
     // Each chef picks one unprepared order and advances it by 1 preparation unit
     private void runChefPhase() {
         List<Order> ordersWorkedOn = new ArrayList<>();
-        for (int i = 0; i < chefs.length; i++) {
+        for (int i = 0; i < noOfChefs; i++) {
             List<Order> ordersToPrepare = new ArrayList<>();
             List<Customer> ordersToPrepareCustomers = new ArrayList<>();
             for (Order existingOrder : allOrders) {
@@ -238,7 +247,7 @@ public class GameController {
     // Each cashier automatically takes payment from the oldest customer who finished eating.
     // A customer served in turn T eats during turn T + 1 and can only pay from turn T + 2.
     private void runCashierPhase(int turn) {
-        for (int i = 0; i < cashiers.length; i++) {
+        for (int i = 0; i < noOfCashiers; i++) {
             Customer payingCustomer = null;
             // allCustomers is in arrival order, so the first match is the oldest customer
             for (Customer customer : allCustomers) {
