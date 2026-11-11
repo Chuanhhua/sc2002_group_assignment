@@ -95,9 +95,18 @@ public class GameController {
 
     public void run() {
         consoleUI.showGameIntro(maxTurns, REQUIRED_PAID_CUSTOMERS, REQUIRED_REVENUE, REQUIRED_AVERAGE_SATISFACTION);
+        
+        // Adds VIPCustomer on the 4th turn,, CriticCustomer on the 7th turn, and regular customers on the 1st, 10th, 13th, and 16th turns
         for (int turn = 1; turn <= maxTurns; turn++) {
             if (turn <= 16 && (turn - 1) % 3 == 0) {
-                Customer customer = new Customer(allCustomers.size() + 1, 100);
+                Customer customer;
+                if (turn == 4) {
+                    customer = new VIPCustomer(allCustomers.size() + 1, 100);
+                } else if (turn == 7) {
+                    customer = new CriticCustomer(allCustomers.size() + 1, 100);
+                } else {
+                    customer = new Customer(allCustomers.size() + 1, 100);
+                }
                 allCustomers.add(customer);
                 waitingCustomers.add(customer);
             }
