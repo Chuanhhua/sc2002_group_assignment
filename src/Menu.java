@@ -11,11 +11,11 @@ public class Menu {
     menuItems = new MenuItem[menuSize];
   }
 
-  public void addMenuItem(String name, double price, int preparationUnits) {
+  public void addMenuItem(String name, int priceCents, int preparationUnits) {
     // Add the menu item to the menuItems array
     for (int i = 0; i < menuItems.length; i++) {
       if (menuItems[i] == null && !doesItemExist(name)) {
-        menuItems[i] = new MenuItem(name, price, preparationUnits);
+        menuItems[i] = new MenuItem(name, priceCents, preparationUnits);
         break;
       }
     }
@@ -37,6 +37,17 @@ public class Menu {
       return null;
     }
     return availableItems.get(random.nextInt(availableItems.size()));
+  }
+
+  // The highest-priced dish on the menu (CriticCustomer always orders this)
+  public MenuItem getMostExpensiveItem() {
+    MenuItem mostExpensive = null;
+    for (MenuItem item : menuItems) {
+      if (item != null && (mostExpensive == null || item.getPriceCents() > mostExpensive.getPriceCents())) {
+        mostExpensive = item;
+      }
+    }
+    return mostExpensive;
   }
 
   private boolean doesItemExist(String name) {

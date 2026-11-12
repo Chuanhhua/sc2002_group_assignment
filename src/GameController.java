@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class GameController {
     // Objectives the player must meet by the end of the last turn to win
     private static final int REQUIRED_PAID_CUSTOMERS = 4;
-    private static final double REQUIRED_REVENUE = 45.0;
+    private static final int REQUIRED_REVENUE_CENTS = 4500; // $45.00
     private static final double REQUIRED_AVERAGE_SATISFACTION = 60.0;
 
     private final int noOfChefs;
@@ -15,7 +15,7 @@ public class GameController {
     private final int maxTurns;
     private final Menu menu;
     private final ConsoleUI consoleUI = new ConsoleUI();
-    private double totalRevenue;
+    private int totalRevenueCents;
     private Table[] tables;
     private List<Customer> allCustomers = new ArrayList<>();
     private List<Customer> waitingCustomers = new ArrayList<>();
@@ -38,28 +38,35 @@ public class GameController {
 
     public GameController(boolean isDefault) {
         this(18, 2, 1, 1, 1, 3); // Default values
-        menu.addMenuItem("Salad", 9.00, 1);
-        menu.addMenuItem("Burger", 15.00, 1);
-        menu.addMenuItem("Pasta", 18.00, 2);
+        menu.addMenuItem("Salad", 900, 1);   // $9.00
+        menu.addMenuItem("Burger", 1500, 1); // $15.00
+        menu.addMenuItem("Pasta", 1800, 2);  // $18.00
     }
 
 
     // ====== Turn Sequence ====
 
     public void run() {
-        consoleUI.showGameIntro(maxTurns, menu.getMenuItems(), REQUIRED_PAID_CUSTOMERS, REQUIRED_REVENUE, REQUIRED_AVERAGE_SATISFACTION);
+        consoleUI.showGameIntro(maxTurns, menu.getMenuItems(), REQUIRED_PAID_CUSTOMERS, REQUIRED_REVENUE_CENTS, REQUIRED_AVERAGE_SATISFACTION);
 
+        // Adds VIPCustomer on the 4th turn,, CriticCustomer on the 7th turn, and regular customers on the 1st, 10th, 13th, and 16th turns
         for (int turn = 1; turn <= maxTurns; turn++) {
             consoleUI.showTurnHeader(turn, maxTurns);
 
-            // Step 1: one Regular customer arrives at the start of turns 1, 4, 7, 10, 13 and 16
             if (turn <= 16 && (turn - 1) % 3 == 0) {
-                Customer customer = new Customer(allCustomers.size() + 1, 100);
+                Customer customer;
+                if (turn == 4) {
+                    customer = new VIPCustomer(allCustomers.size() + 1, 100);
+                } else if (turn == 7) {
+                    customer = new CriticCustomer(allCustomers.size() + 1, 100);
+                } else {
+                    customer = new Customer(allCustomers.size() + 1, 100);
+                }
                 allCustomers.add(customer);
                 waitingCustomers.add(customer);
                 consoleUI.showArrival(customer);
             }
-            consoleUI.showTurnStatus(turn, totalRevenue, getPaidCustomerCount(), getAveragePaidSatisfactionScore(),
+            consoleUI.showTurnStatus(turn, totalRevenueCents, getPaidCustomerCount(), getAveragePaidSatisfactionScore(),
                     waitingCustomers, tables);
             consoleUI.showStaffTasks(waitingCustomers.size(), countFreeTables(), getTablesReadyToOrder().size(),
                     getOrdersReadyToServe().size(), getOrdersToCook().size(), countCustomersReadyToPay(turn));
@@ -76,16 +83,16 @@ public class GameController {
             int[] satisfactionBefore = recordSatisfaction();
             runSatisfactionPhase();
             showSatisfactionChanges(satisfactionBefore);
-            consoleUI.showTurnResults(turn, maxTurns, getServedCount(), getDepartedCount(), totalRevenue,
+            consoleUI.showTurnResults(turn, maxTurns, getServedCount(), getDepartedCount(), totalRevenueCents,
                     getPaidCustomerCount(), getAveragePaidSatisfactionScore());
         }
 
         // Step 6: result
         int paidCustomerCount = getPaidCustomerCount();
         double averagePaidSatisfaction = getAveragePaidSatisfactionScore();
-        consoleUI.showGameSummary(maxTurns, allCustomers, totalRevenue, paidCustomerCount, averagePaidSatisfaction,
-                REQUIRED_PAID_CUSTOMERS, REQUIRED_REVENUE, REQUIRED_AVERAGE_SATISFACTION);
-        boolean victory = paidCustomerCount >= REQUIRED_PAID_CUSTOMERS && totalRevenue >= REQUIRED_REVENUE
+        consoleUI.showGameSummary(maxTurns, allCustomers, totalRevenueCents, paidCustomerCount, averagePaidSatisfaction,
+                REQUIRED_PAID_CUSTOMERS, REQUIRED_REVENUE_CENTS, REQUIRED_AVERAGE_SATISFACTION);
+        boolean victory = paidCustomerCount >= REQUIRED_PAID_CUSTOMERS && totalRevenueCents >= REQUIRED_REVENUE_CENTS
                 && averagePaidSatisfaction >= REQUIRED_AVERAGE_SATISFACTION;
         consoleUI.showFinalResult(victory);
     }
@@ -152,15 +159,22 @@ public class GameController {
             return false; // cancelled, the Waiter can still choose a task
         }
         Customer orderingCustomer = tables[tableIndex].getCurrentCustomer();
-        // The customer picks their own dish (seeded random); every order contains exactly 1 of it
-        MenuItem orderedItem = menu.getRandomMenuItem();
-        Order order = new Order(orderedItem, 1);
+        // The customer object decides what it orders and what it pays (no type checks here).
+        // The price is locked now, when the order is taken; every order contains exactly 1 dish.
+        MenuItem orderedItem = orderingCustomer.chooseMenuItem(menu);
+        int fullPriceCents = orderedItem.getPriceCents();
+        int priceCents = orderingCustomer.calculateBill(fullPriceCents);
+        Order order = new Order(orderedItem, 1, priceCents);
         allOrders.add(order);
         // Attach the order before advancing so PREPARE_ORDER picks up its preparation units
         orderingCustomer.setCurrentOrder(order);
         orderingCustomer.advaceToNextTask();
-        consoleUI.showSuccess("Customer " + orderingCustomer.getCustomerId() + " at Table " + (tableIndex + 1)
-                + " orders " + orderedItem.getItemName() + " (" + ConsoleUI.money(orderedItem.getPrice()) + ", "
+        String price = ConsoleUI.money(priceCents);
+        if (priceCents != fullPriceCents) {
+            price += ", was " + ConsoleUI.money(fullPriceCents);
+        }
+        consoleUI.showSuccess("Customer " + orderingCustomer.getCustomerId() + " (" + orderingCustomer.getTypeName()
+                + ") at Table " + (tableIndex + 1) + " orders " + orderedItem.getItemName() + " (" + price + ", "
                 + orderedItem.getPreparationUnits() + " prep unit" + (orderedItem.getPreparationUnits() == 1 ? "" : "s")
                 + ").");
         return true;
@@ -248,14 +262,14 @@ public class GameController {
                 continue;
             }
             Order paidOrder = payingCustomer.getCurrentOrder();
-            double paymentAmount = paidOrder.getTotalPrice();
-            totalRevenue += paymentAmount;
+            int paymentCents = paidOrder.getPriceCents();
+            totalRevenueCents += paymentCents;
             payingCustomer.setPaid(true);
             paidOrder.setPaid(true);
             payingCustomer.advaceToNextTask();
             int tableNumber = freeTableOf(payingCustomer);
             consoleUI.showSuccess("Customer " + payingCustomer.getCustomerId() + " paid "
-                    + ConsoleUI.money(paymentAmount) + " (satisfaction " + payingCustomer.getSatisfactionScore()
+                    + ConsoleUI.money(paymentCents) + " (satisfaction " + payingCustomer.getSatisfactionScore()
                     + " recorded). Table " + tableNumber + " is free.");
         }
     }
@@ -402,8 +416,8 @@ public class GameController {
 
     // ===================== Results =====================
 
-    public double getTotalRevenue() {
-        return totalRevenue;
+    public int getTotalRevenueCents() {
+        return totalRevenueCents;
     }
 
     public List<Customer> getAllCustomers() {

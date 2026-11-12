@@ -69,6 +69,21 @@ public class Customer {
     return REGULAR_SATISFACTION_LOSS_PER_TURN;
   }
 
+  // ----- Behaviour each customer type can override (polymorphism) -----
+  public String getTypeName() {
+    return "Regular";
+  }
+
+  // Regular customers pick from the menu (seeded random)
+  public MenuItem chooseMenuItem(Menu menu) {
+    return menu.getRandomMenuItem();
+  }
+
+  // What this customer pays, in cents. Regular customers pay full price.
+  public int calculateBill(int fullPriceCents) {
+    return fullPriceCents;
+  }
+
   // True while the customer is waiting to be seated, to order, or for their dish to be served.
   // Customers who have been served (eating or ready to pay), paid, or left are not waiting.
   public boolean isAwaitingService() {
