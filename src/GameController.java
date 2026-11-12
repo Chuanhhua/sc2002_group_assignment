@@ -44,7 +44,6 @@ public class GameController {
     menu.addMenuItem("Pasta", 1800, 2);
 
     MenuItem[] items = menu.getMenuItems();
-
     menu.addComboMeal(items[0], items[2]);
     }
 
