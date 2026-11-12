@@ -160,6 +160,10 @@ public class ConsoleUI {
     public int promptInt(String prompt, int min, int max) {
         while (true) {
             System.out.print(prompt);
+            if (!scanner.hasNextLine()) {
+                System.out.println("\nInput ended before the game finished. Is the test file complete?");
+                System.exit(1);
+            }
             String line = scanner.nextLine().trim();
             try {
                 int value = Integer.parseInt(line);
