@@ -6,14 +6,16 @@ public class Order {
   private boolean isPrepared;
   private boolean isPaid;
   private int servedTurn;
+  private final int priceCents;
 
-  public Order(MenuItem menuItem, int quantity) {
+  public Order(MenuItem menuItem, int quantity, int priceCents) {
     this.menuItem = menuItem;
     this.quantity = quantity;
     this.isServed = false;
     this.isPrepared = false;
     this.isPaid = false;
     this.servedTurn = -1;
+    this.priceCents = priceCents;
     this.remainingPreparationUnits = menuItem.getPreparationUnits() * quantity;
   }
 
@@ -53,9 +55,7 @@ public class Order {
     this.servedTurn = servedTurn;
   }
 
-  public double getTotalPrice() {
-    return menuItem.getPrice() * quantity;
-  }
+  public int getPriceCents() { return priceCents;}
 
   public int getRemainingPreparationUnits() {
     return remainingPreparationUnits;

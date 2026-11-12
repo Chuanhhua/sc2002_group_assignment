@@ -1,11 +1,11 @@
 public class MenuItem {
   private final String itemName;
-  private final double price;
+  private final int priceCents;
   private final int preparationUnits;
 
-  public MenuItem(String itemName, double price, int preparationUnits) {
+  public MenuItem(String itemName, int priceCents, int preparationUnits) {
     this.itemName = itemName;
-    this.price = price;
+    this.priceCents = priceCents;
     this.preparationUnits = preparationUnits;
   }
 
@@ -13,8 +13,8 @@ public class MenuItem {
     return itemName;
   }
 
-  public double getPrice() {
-    return price;
+  public int getPriceCents() {
+    return priceCents;
   }
 
   public int getPreparationUnits() {
@@ -24,7 +24,7 @@ public class MenuItem {
   public String toString() {
     return "MenuItem{" +
         "itemName = '" + itemName + '\'' +
-        ", price = $" + String.format("%.2f", price) +
+        ", priceCents = $" + String.format("%.2f", priceCents) +
         ", preparationUnits = " + preparationUnits +
         '}';
   }

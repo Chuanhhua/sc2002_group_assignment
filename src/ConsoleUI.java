@@ -14,9 +14,14 @@ public class ConsoleUI {
         int padding = Math.max(0, (WIDTH - text.length())/2);
         return " ".repeat(padding) + text;
     }
-    // format money values to 2dp
-    public static String money(double amount){
-        return String.format("$%.2f", amount);
+    // money is stored as whole cents (e.g. 1350) and shown as dollars (e.g. $13.50)
+    public static String money(int cents){
+        return String.format("$%d.%02d", cents / 100, cents % 100);
+    }
+
+    // e.g. "Customer 2 (VIP)"
+    private static String name(Customer customer){
+        return "Customer " + customer.getCustomerId() + " (" + customer.getTypeName() + ")";
     }
 
     // showing the average satisfaction only once someone has paid; before that would show N/A
@@ -51,7 +56,7 @@ public class ConsoleUI {
     }
 
     // =========== Game Start ============
-    public void showGameIntro(int turns, MenuItem[] menuItems, int requiredPaidCustomers, double requiredRevenue,
+    public void showGameIntro(int turns, MenuItem[] menuItems, int requiredPaidCustomers, int requiredRevenueCents,
                               double requiredAverageSatisfaction) {
         System.out.println(line('='));
         System.out.println(center("RESTAURANT RUSH"));
@@ -61,14 +66,17 @@ public class ConsoleUI {
         System.out.println();
         for (MenuItem item : menuItems){
             if (item != null){
-                System.out.printf("     %-8s %7s     %s%n", item.getItemName(), money(item.getPrice()), plural(item.getPreparationUnits(), "prep unit"));
+                System.out.printf("     %-8s %7s     %s%n", item.getItemName(), money(item.getPriceCents()), plural(item.getPreparationUnits(), "prep unit"));
             }
         }
         System.out.println();
         System.out.println("Objective by the end of turn " + turns + ":");
         System.out.println(" - At least " + requiredPaidCustomers + " paid customers");
-        System.out.println(" - Revenue of at least " + money(requiredRevenue));
+        System.out.println(" - Revenue of at least " + money(requiredRevenueCents));
         System.out.printf(" - Average satisfaction of paid customers of at least %.0f%n", requiredAverageSatisfaction);
+        System.out.println();
+        System.out.println("Customers: Regular lose 8 satisfaction per waiting turn, VIPs lose 5 and pay 10% less,");
+        System.out.println("Critics lose 12 and always order the most expensive dish.");
         System.out.println("Good luck!");
     }
 
@@ -83,14 +91,14 @@ public class ConsoleUI {
     }
 
     public void showArrival(Customer customer){
-        System.out.println("\t[+] Customer " + customer.getCustomerId() + " arrives and joins the waiting queue.");
+        System.out.println("\t[+] " + name(customer) + " arrives and joins the waiting queue.");
     }
 
-    public void showTurnStatus(int turn, double revenue, int paidCustomerCount, double averagePaidSatisfaction,
+    public void showTurnStatus(int turn, int revenueCents, int paidCustomerCount, double averagePaidSatisfaction,
                                List<Customer> waitingCustomers, Table[] tables) {
         System.out.println();
         // Display the turn number, revenue, average satisfaction
-        System.out.println("\tRevenue: " + money(revenue) + "\t|\tPaid: " + paidCustomerCount + "\t|\tAverage satisfaction of paid customers: " + average(averagePaidSatisfaction, paidCustomerCount));
+        System.out.println("\tRevenue: " + money(revenueCents) + "\t|\tPaid: " + paidCustomerCount + "\t|\tAverage satisfaction of paid customers: " + average(averagePaidSatisfaction, paidCustomerCount));
         System.out.println();
         // Display waiting queue
         System.out.println("\tWAITING QUEUE:");
@@ -98,7 +106,7 @@ public class ConsoleUI {
             System.out.println("\t\t(Empty)");
         } else {
             for (Customer customer : waitingCustomers) {
-                System.out.printf("\t\tCustomer %-3d  Satisfaction [%3d] -- Waiting for a table%n", customer.getCustomerId(), customer.getSatisfactionScore());
+                System.out.printf("\t\t%-20s  Satisfaction [%3d] -- Waiting for a table%n", name(customer), customer.getSatisfactionScore());
             }
         }
 
@@ -112,7 +120,7 @@ public class ConsoleUI {
                 continue;
             }
             Customer customer = tables[i].getCurrentCustomer();
-            System.out.printf("\t\tTable %d : Customer %3d  Satisfaction %3d   %s%n", i+1, customer.getCustomerId(), customer.getSatisfactionScore(), describeStatus(customer, turn));
+            System.out.printf("\t\tTable %d : %-20s  Satisfaction %3d   %s%n", i+1, name(customer), customer.getSatisfactionScore(), describeStatus(customer, turn));
         }
 
     }
@@ -221,12 +229,12 @@ public class ConsoleUI {
                 + before + " -> " + after);
     }
 
-    public void showTurnResults(int turn, int maxTurns, int servedCount, int departedCount, double revenue,
+    public void showTurnResults(int turn, int maxTurns, int servedCount, int departedCount, int revenueCents,
                                 int paidCustomerCount, double averagePaidSatisfaction) {
         System.out.println();
         System.out.println("\tServed: " + servedCount
                 + "\t|\tLeft unhappy: " + departedCount
-                + "\t|\tRevenue: " + money(revenue)
+                + "\t|\tRevenue: " + money(revenueCents)
                 + "\t|\tAvg satisfaction: " + average(averagePaidSatisfaction, paidCustomerCount)
                 + "\t|\tTurns used: " + turn + "/" + maxTurns);
     }
@@ -234,8 +242,8 @@ public class ConsoleUI {
     // ====== GAME END =====
 
 
-    public void showGameSummary(int turns, List<Customer> customers, double revenue, int paidCustomerCount,
-                                double averagePaidSatisfaction, int requiredPaidCustomers, double requiredRevenue,
+    public void showGameSummary(int turns, List<Customer> customers, int revenueCents, int paidCustomerCount,
+                                double averagePaidSatisfaction, int requiredPaidCustomers, int requiredRevenueCents,
                                 double requiredAverageSatisfaction) {
         System.out.println();
         System.out.println();
@@ -255,21 +263,21 @@ public class ConsoleUI {
             if (customer.hasLeft()) {
                 status = "Left without paying";
             } else if (customer.isPaid()) {
-                status = String.format("Paid $%.2f for %s", order.getTotalPrice(), order.getMenuItem().getItemName());
+                status = "Paid " + money(order.getPriceCents()) + " for " + order.getMenuItem().getItemName();
             } else if (task != null) {
                 status = "Unpaid, " + task.toString().toLowerCase();
             } else {
                 status = "Unpaid";
             }
-            System.out.printf("\tCustomer %-3d  Satisfaction %3d  %s%n", customer.getCustomerId(),
+            System.out.printf("\t%-20s  Satisfaction %3d  %s%n", name(customer),
                     customer.getSatisfactionScore(), status);
         }
         System.out.println();
         System.out.println("\tOBJECTIVES: ");
         System.out.printf("\t\tPaid customers  %8s / %-8s %s%n", paidCustomerCount, requiredPaidCustomers,
                 objectiveStatus(paidCustomerCount >= requiredPaidCustomers));
-        System.out.printf("\t\tRevenue  %8s / %-8s %s%n", money(revenue), money(requiredRevenue),
-                objectiveStatus(revenue >= requiredRevenue));
+        System.out.printf("\t\tRevenue  %8s / %-8s %s%n", money(revenueCents), money(requiredRevenueCents),
+                objectiveStatus(revenueCents >= requiredRevenueCents));
         System.out.printf("\t\tAvg satisfaction  %8s / %-8.0f %s%n",
                 average(averagePaidSatisfaction, paidCustomerCount), requiredAverageSatisfaction,
                 objectiveStatus(paidCustomerCount > 0 && averagePaidSatisfaction >= requiredAverageSatisfaction));
