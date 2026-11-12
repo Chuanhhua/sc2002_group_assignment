@@ -21,6 +21,17 @@ public class Menu {
     }
   }
 
+  public void addComboMeal(MenuItem firstItem, MenuItem secondItem) {
+    ComboMeal combo = new ComboMeal(firstItem, secondItem);
+
+    for (int i = 0; i < menuItems.length; i++) {
+        if (menuItems[i] == null) {
+            menuItems[i] = combo;
+            break;
+        }
+    }
+  }
+
   public MenuItem[] getMenuItems() {
     return menuItems;
   }
