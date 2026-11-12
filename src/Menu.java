@@ -3,7 +3,8 @@ import java.util.List;
 import java.util.Random;
 
 public class Menu {
-  private final Random random = new Random();
+  private static final long RANDOM_SEED = 2002;
+  private final Random random = new Random(RANDOM_SEED);// so that each run can be replayed
   private MenuItem[] menuItems;
 
   public Menu(int menuSize) {
