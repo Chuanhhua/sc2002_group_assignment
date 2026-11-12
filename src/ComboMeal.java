@@ -6,8 +6,8 @@
 
 public class ComboMeal extends MenuItem {
 
-    private MenuItem firstItem;
-    private MenuItem secondItem;
+    private final MenuItem firstItem;
+    private final MenuItem secondItem;
 
     public ComboMeal(MenuItem firstItem, MenuItem secondItem) {
         super(
