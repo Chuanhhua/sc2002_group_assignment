@@ -37,10 +37,15 @@ public class GameController {
     }
 
     public GameController(boolean isDefault) {
-        this(18, 2, 1, 1, 1, 3); // Default values
-        menu.addMenuItem("Salad", 900, 1);   // $9.00
-        menu.addMenuItem("Burger", 1500, 1); // $15.00
-        menu.addMenuItem("Pasta", 1800, 2);  // $18.00
+    this(18, 2, 1, 1, 1, 4);
+
+    menu.addMenuItem("Salad", 900, 1);
+    menu.addMenuItem("Burger", 1500, 1);
+    menu.addMenuItem("Pasta", 1800, 2);
+
+    MenuItem[] items = menu.getMenuItems();
+
+    menu.addComboMeal(items[0], items[2]);
     }
 
 
