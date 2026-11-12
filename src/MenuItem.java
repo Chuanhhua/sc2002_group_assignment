@@ -24,7 +24,7 @@ public class MenuItem {
   public String toString() {
     return "MenuItem{" +
         "itemName = '" + itemName + '\'' +
-        ", priceCents = $" + String.format("%.2f", priceCents) +
+        ", priceCents = $" + ConsoleUI.money(priceCents) +
         ", preparationUnits = " + preparationUnits +
         '}';
   }

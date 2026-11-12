@@ -40,10 +40,6 @@ public class Customer {
     return isPaid;
   }
 
-  public void setSatisfactionScore(int satisfactionScore) {
-    this.satisfactionScore = satisfactionScore;
-  }
-
   public void setPaid(boolean isPaid) {
     this.isPaid = isPaid;
   }

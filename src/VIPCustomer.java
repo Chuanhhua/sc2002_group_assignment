@@ -16,7 +16,7 @@ public class VIPCustomer extends Customer {
     // VIPs pay 10% less
     @Override
     public int calculateBill(int fullPriceCents) {
-        return (int) Math.round(fullPriceCents * 0.9);
+        return (fullPriceCents * 9 + 5) / 10;   // 90%, rounded half up, no doubles;
     }
 
 }

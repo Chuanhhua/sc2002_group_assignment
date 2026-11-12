@@ -416,22 +416,6 @@ public class GameController {
 
     // ===================== Results =====================
 
-    public int getTotalRevenueCents() {
-        return totalRevenueCents;
-    }
-
-    public List<Customer> getAllCustomers() {
-        return allCustomers;
-    }
-
-    public List<Customer> getWaitingCustomers() {
-        return waitingCustomers;
-    }
-
-    public List<Order> getAllOrders() {
-        return allOrders;
-    }
-
     // Customers whose dish has been served (including those who have since paid)
     public int getServedCount() {
         int count = 0;
