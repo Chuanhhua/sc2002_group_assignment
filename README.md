@@ -1,6 +1,6 @@
 # Restaurant Rush 
 
-Welcome! This is the documentation for the responsible for the Restaurant Rush Group Assginment done by SC2002 SCEA Group 1.
+Welcome! This is the documentation for the Restaurant Rush Group Assginment done by SC2002 SCEA Group 1.
 
 GitHub Repository: https://github.com/Chuanhhua/sc2002_group_assignment
 
@@ -46,7 +46,7 @@ Compare: https://github.com/Chuanhhua/sc2002_group_assignment/compare/stage-1...
 | --- | --- |
 | ```src/VIPCustomer.java``` | A ```Customer``` that loses 5 satisfaction per waiting turn and pays 10% less (overrides ```getSatisfactionLossPerTurn()``` and ```calculateBill()```) |
 | ```src/CriticCustomer.java``` | A ```Customer``` that loses 12 satisfaction per waiting turn and always orders the most expensive dish (overrides ```chooseMenuItem()```) |
-| ```tests/stage2-victory.txt```, ```tests/stage2-defeat.txt``` | Reproducible Stage 2 runs. They replace the Stage 1 test files, which stay in the ```stage-1 tag```. |
+| ```tests/stage2-victory.txt```, ```tests/stage2-defeat.txt``` | Reproducible Stage 2 runs. They replace the Stage 1 test files, which stay in the ```stage-1```. |
 
 ### Modifications
 | File | Change | Reason |
@@ -61,7 +61,7 @@ Compare: https://github.com/Chuanhhua/sc2002_group_assignment/compare/stage-1...
 No source files were deleted.
 
 ### What still works
-- The turn order, the staff rules, payment timing and the win and lose targets are unchanged.az
+- The turn order, the staff rules, payment timing and the win and lose targets are unchanged.
 - Regular customers still lose 8 satisfaction per turn and pay full price: they use Customer's default methods.
 - The ```stage-1``` tag still compiles and its test files still give VICTORY and DEFEAT.
 - At ```stage-2```: ```tests/stage2-victory.txt``` gives VICTORY (5 paid, $70.50, average satisfaction 78.0); ```tests/stage2-defeat.txt``` gives DEFEAT.
