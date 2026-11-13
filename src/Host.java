@@ -18,7 +18,7 @@ public class Host {
     }
 
     /**
-     * Seat customerand mvoe them on to ordering.
+     * Seat customer and move them on to ordering.
      * The caller will take the customer out of the waiting q
      * @throws IllegalStateException if the host has already sat someone in this turn
      * @throws IllegalArgumentException if the table is occupied

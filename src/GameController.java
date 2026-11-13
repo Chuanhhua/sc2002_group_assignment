@@ -149,13 +149,15 @@ public class GameController {
         int tableIndex = findFreeTableIndex();
         if (tableIndex < 0) {
             consoleUI.showMessage("All tables are occupied. The host waits.");
+            return;
         }
-        Customer nextCustomer = waitingCustomers.remove(0);
+        Customer nextCustomer = waitingCustomers.get(0);
         // Checks if the manager asks the host to seat customer
         if (!consoleUI.askHostToSeat(nextCustomer)){
             consoleUI.showMessage("The host waits.");
             return;
         }
+        waitingCustomers.remove(0);
         host.seatCustomer(nextCustomer, tables[tableIndex]);
         waitingCustomers.remove(nextCustomer);
         consoleUI.showSuccess("Thanks to the lovely host, Customer " + nextCustomer.getCustomerId() + " is seated at Table " + (tableIndex + 1) + ".");
