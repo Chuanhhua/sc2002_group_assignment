@@ -20,22 +20,23 @@ public class Menu {
       }
     }
   }
-
-  public void addComboMeal(MenuItem firstItem, MenuItem secondItem) {
+  // returns false if the menu is full
+  // caller decides what to tell the player
+  public boolean addComboMeal(MenuItem firstItem, MenuItem secondItem) {
     ComboMeal combo = new ComboMeal(firstItem, secondItem);
 
     if (doesItemExist(combo.getItemName())) {
-        return;
+        return true; // already on the menu
     }
 
     for (int i = 0; i < menuItems.length; i++) {
         if (menuItems[i] == null) {
             menuItems[i] = combo;
-            return;
+            return true;
         }
     }
 
-    System.out.println("Menu is full. Cannot add ComboMeal.");
+    return false;
   }
 
   public MenuItem[] getMenuItems() {

@@ -41,14 +41,16 @@ public class GameController {
     }
 
     public GameController(boolean isDefault) {
-    this(18, 2, 1, 1, 1, 4);
+        this(18, 2, 1, 1, 1, 4);
 
-    menu.addMenuItem("Salad", 900, 1);
-    menu.addMenuItem("Burger", 1500, 1);
-    menu.addMenuItem("Pasta", 1800, 2);
+        menu.addMenuItem("Salad", 900, 1);
+        menu.addMenuItem("Burger", 1500, 1);
+        menu.addMenuItem("Pasta", 1800, 2);
 
-    MenuItem[] items = menu.getMenuItems();
-    menu.addComboMeal(items[0], items[2]);
+        MenuItem[] items = menu.getMenuItems();
+        if(!menu.addComboMeal(items[0], items[2])){
+            consoleUI.showWarning("Menu is full. Cannot add ComboMeal.");
+        }
     }
 
 
@@ -159,7 +161,6 @@ public class GameController {
         }
         waitingCustomers.remove(0);
         host.seatCustomer(nextCustomer, tables[tableIndex]);
-        waitingCustomers.remove(nextCustomer);
         consoleUI.showSuccess("Thanks to the lovely host, Customer " + nextCustomer.getCustomerId() + " is seated at Table " + (tableIndex + 1) + ".");
     }
 
@@ -369,8 +370,7 @@ public class GameController {
                     break;
                 }
             }
-            System.out.println("Customer " + customer.getCustomerId()
-                    + " ran out of patience and left without paying.");
+            consoleUI.showWarning("Customer " + customer.getCustomerId() + " run out of patience and left without paying.");
         }
     }
 
