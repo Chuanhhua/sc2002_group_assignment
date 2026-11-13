@@ -21,6 +21,23 @@ public class Menu {
     }
   }
 
+  public void addComboMeal(MenuItem firstItem, MenuItem secondItem) {
+    ComboMeal combo = new ComboMeal(firstItem, secondItem);
+
+    if (doesItemExist(combo.getItemName())) {
+        return;
+    }
+
+    for (int i = 0; i < menuItems.length; i++) {
+        if (menuItems[i] == null) {
+            menuItems[i] = combo;
+            return;
+        }
+    }
+
+    System.out.println("Menu is full. Cannot add ComboMeal.");
+  }
+
   public MenuItem[] getMenuItems() {
     return menuItems;
   }
