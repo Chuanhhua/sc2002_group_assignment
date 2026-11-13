@@ -1,5 +1,7 @@
 public class Customer {
   private static final int REGULAR_SATISFACTION_LOSS_PER_TURN = 8;
+  // Zong Nan: I added a new MAX_SATISFACTION_SCORE
+  private static final int MAX_SATISFACTION_SCORE = 100;
 
   private int customerId;
   private int satisfactionScore;
@@ -90,6 +92,13 @@ public class Customer {
   // Applies the end-of-turn satisfaction loss, never going below 0
   public void loseSatisfaction() {
     satisfactionScore = Math.max(0, satisfactionScore - getSatisfactionLossPerTurn());
+  }
+
+  /**
+   * Add satisfaction back, up to 100. HappyHour calls this for customers who are waiting.
+   */
+  public void recoverSatisfaction(int amount) {
+    satisfactionScore = Math.min(satisfactionScore + amount, MAX_SATISFACTION_SCORE);
   }
 
   // The customer walks out without paying; they no longer have any task
