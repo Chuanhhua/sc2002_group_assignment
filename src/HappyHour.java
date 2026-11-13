@@ -29,7 +29,7 @@ public class HappyHour{
 
     /**
      * Switches Happy Hour on, and throws if it has been used before
-     * The UI only offers it while canActivate() is true
+     * The UI only offers it while hasBeenUsed is true
      */
     public void activate() {
         if (hasBeenUsed) {
@@ -60,7 +60,7 @@ public class HappyHour{
             return fullPriceCents;
         }
         // Math ceiling rounds up to the nearest whole number, so we can use it to round up to the nearest cent
-        return (int) Math.ceil(fullPriceCents * PERCENT_TO_BE_PAID / 100.0);
+        return (int) Math.round(fullPriceCents * PERCENT_TO_BE_PAID / 100.0);
     }
     /**
      * Gives 15 satisfaction to every customer who is still waiting. isAwaitingService() is false
