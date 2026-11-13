@@ -21,6 +21,10 @@ public class GameController {
     private List<Customer> waitingCustomers = new ArrayList<>();
     private List<Order> allOrders = new ArrayList<>();
 
+    // Stage 3
+    private final HappyHour happyHour = new HappyHour();
+    private final Host host = new Host();
+
     public GameController(int maxTurns, int noOfTables, int noOfChefs, int noOfWaiters, int noOfCashiers,
                           int menuSize) {
 
@@ -70,12 +74,18 @@ public class GameController {
                 waitingCustomers.add(customer);
                 consoleUI.showArrival(customer);
             }
+
+            runHappyHourStart();
+
             consoleUI.showTurnStatus(turn, totalRevenueCents, getPaidCustomerCount(), getAveragePaidSatisfactionScore(),
                     waitingCustomers, tables);
+            consoleUI.showHappyHourStatus(happyHour.isActive(), happyHour.getRemainingTurns(), happyHour.canBeUsed());
             consoleUI.showStaffTasks(waitingCustomers.size(), countFreeTables(), getTablesReadyToOrder().size(),
                     getOrdersReadyToServe().size(), getOrdersToCook().size(), countCustomersReadyToPay(turn));
 
             // Steps 2-3: the Waiter acts before the Chef
+            // The host will carry out their duties before the waiter
+            runHostPhase();
             runWaiterPhase(turn);
             runChefPhase();
 
@@ -87,6 +97,7 @@ public class GameController {
             int[] satisfactionBefore = recordSatisfaction();
             runSatisfactionPhase();
             showSatisfactionChanges(satisfactionBefore);
+            happyHour.endTurn();
             consoleUI.showTurnResults(turn, maxTurns, getServedCount(), getDepartedCount(), totalRevenueCents,
                     getPaidCustomerCount(), getAveragePaidSatisfactionScore());
         }
@@ -99,6 +110,55 @@ public class GameController {
         boolean victory = paidCustomerCount >= REQUIRED_PAID_CUSTOMERS && totalRevenueCents >= REQUIRED_REVENUE_CENTS
                 && averagePaidSatisfaction >= REQUIRED_AVERAGE_SATISFACTION;
         consoleUI.showFinalResult(victory);
+    }
+
+    // ======= Happy Hour =======
+
+    /**
+     * The manager decides at the start of the turn whether to run HappyHour
+     * Runs if HappyHour is active
+     * Applies the satisfaction recovery to all waiting customers
+     */
+    private void runHappyHourStart() {
+        if (happyHour.canBeUsed() && consoleUI.askIfWantToStartHappyHour()) {
+            consoleUI.showPhase("HAPPY HOUR");
+            happyHour.activate();
+        }
+
+        // If Happy Hour is active, recover satisfaction for all waiting customers
+        int [] satisfactionBefore = recordSatisfaction();
+        happyHour.recoverWaitingCustomers(allCustomers);
+
+        for (int i = 0; i < satisfactionBefore.length; i++) {
+            Customer customer = allCustomers.get(i);
+            if (customer.getSatisfactionScore() > satisfactionBefore[i]) {
+                consoleUI.showSatisfactionRecovery(customer, satisfactionBefore[i], customer.getSatisfactionScore());
+            }
+        }
+    }
+
+    // ======= Host =======
+    // The host wil go before the Waiter, and like th waiter, it seats the customer at the front
+    // of the queue at the first free table.
+    private void runHostPhase() {
+        host.startTurn();
+        if (waitingCustomers.isEmpty()) {
+            consoleUI.showMessage("No customers are waiting to be seated. The host waits.");
+            return;
+        }
+        int tableIndex = findFreeTableIndex();
+        if (tableIndex < 0) {
+            consoleUI.showMessage("All tables are occupied. The host waits.");
+        }
+        Customer nextCustomer = waitingCustomers.remove(0);
+        // Checks if the manager asks the host to seat customer
+        if (!consoleUI.askHostToSeat(nextCustomer)){
+            consoleUI.showMessage("The host waits.");
+            return;
+        }
+        host.seatCustomer(nextCustomer, tables[tableIndex]);
+        waitingCustomers.remove(nextCustomer);
+        consoleUI.showSuccess("Thanks to the lovely host, Customer " + nextCustomer.getCustomerId() + " is seated at Table " + (tableIndex + 1) + ".");
     }
 
     // ======= Waiter =======
@@ -167,7 +227,9 @@ public class GameController {
         // The price is locked now, when the order is taken; every order contains exactly 1 dish.
         MenuItem orderedItem = orderingCustomer.chooseMenuItem(menu);
         int fullPriceCents = orderedItem.getPriceCents();
-        int priceCents = orderingCustomer.calculateBill(fullPriceCents);
+        // int priceCents = orderingCustomer.calculateBill(fullPriceCents);
+        // Stage 2 to Stage 3: the VIP discount first, then the HappyHour discount
+        int priceCents = happyHour.applyTo(orderingCustomer.calculateBill(fullPriceCents));
         Order order = new Order(orderedItem, 1, priceCents);
         allOrders.add(order);
         // Attach the order before advancing so PREPARE_ORDER picks up its preparation units
@@ -416,6 +478,16 @@ public class GameController {
             }
         }
         return null;
+    }
+
+    // For host to find table
+    private int findFreeTableIndex() {
+        for (int i = 0; i < tables.length; i++) {
+            if (!tables[i].isOccupied()) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     // ===================== Results =====================
