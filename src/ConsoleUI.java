@@ -298,4 +298,46 @@ public class ConsoleUI {
         System.out.println(line('*'));
     }
 
+    //Stage 3
+    /**
+     * Printed every turn, remaining duration is always of the Happy Hour, even if it has been used before, is always
+     * displayed to the player
+     *
+     */
+    public void showHappyHourStatus(boolean isActive, int remainingTurns, boolean canBeUsed){
+        if (isActive){
+            System.out.println("\tHAPPY HOUR: ACTIVE, " + plural(remainingTurns, "turn") + " remaining (20% off orders taken now)");
+        }
+        else if (canBeUsed){
+            System.out.println("\tHAPPY HOUR: AVAILABLE (ONCE PER GAME)");
+        }
+        else {
+            System.out.println("\tHAPPY HOUR: USED");
+        }
+    }
+
+    /**
+     * Asked at the start until Happy Hour has been used
+     */
+    public boolean askIfWantToStartHappyHour(){
+        System.out.println("\tActivate Happy Hour now? It will last two rounds: this round and the next!");
+        System.out.println("\t\t 0. No");
+        System.out.println("\t\t 1. Yes");
+        return promptInt("Enter choice [0-1]: ", 0, 1) == 1;
+    }
+
+    public void showSatisfactionRecovery(Customer customer, int before, int after){
+        System.out.println("\t" + name(customer) + " satisfaction recovered from " + before + " to " + after);
+    }
+
+    /**
+     * True if the manager tells the Host to seat the customer at the front of the queue."
+     */
+    public boolean askHostToSeat(Customer nextCustomer){
+        System.out.println("\t" + name(nextCustomer) + " is waiting in the queue. Do you want the host to seat them now?");
+        System.out.println("\t\t 0. No");
+        System.out.println("\t\t 1. Yes");
+        return promptInt("Enter choice [0-1]: ", 0, 1) == 1;
+    }
+
 }
