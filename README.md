@@ -10,7 +10,7 @@ GitHub Repository: https://github.com/Chuanhhua/sc2002_group_assignment
 | Bryan Ng Xu Hen | ```bryannxh``` |
 | Caleb Fong Tze Wei (Feng Zhiwei) | ```ccalebbf``` |
 | Liu Chuanhua | ```Chuanhhua``` |
-| Ng Xin Yi | ```xxyyng11``` |
+| Ng Xin Yi | ```xxyyng11``` / ```techforgood39``` |
 | Tang Zong Nan | ```ztang017``` |
 
 ## How to build and Run
