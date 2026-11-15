@@ -1,6 +1,6 @@
 # Restaurant Rush 
 
-Welcome! This is the documentation for the Restaurant Rush Group Assginment done by SC2002 SCEA Group 1.
+Welcome! This is the documentation for the Restaurant Rush Group Assignment done by SC2002 SCEA Group 1.
 
 GitHub Repository: https://github.com/Chuanhhua/sc2002_group_assignment
 
@@ -35,8 +35,10 @@ Replay a recorded test run:
 | --- | --- |
 | Seed | Dishes are picked with new Random(2002), such that the nth order is always the same dish. |
 | ```CriticCustomer``` | Always orders the most expensive item on the menu. |
-| ```ComboMeal``` | Insert Rule implemented by Zong Nan |
+| ```ComboMeal``` | Salad + Pasta, built from two items already on the menu so its price follows theirs: 90% of their combined price ($24.30) and their prep units added (3). The Critic always orders it as the most expensive item. |
 | ```Host``` | Acts before the waiter, such that the customer it seats can order within the same turn. |
+| ```HappyHour``` | Asked at the start of a turn, before the Host and Waiter; usable once per game and lasts two turns. The VIP's 10% is applied first, then Happy Hour's 20%, and the price is fixed in the ```Order``` when it is taken. |
+| Money | All prices are ```int``` cents; both discounts round to the nearest cent. |
 
 ## Stage 1 to Stage 2
 Compare: https://github.com/Chuanhhua/sc2002_group_assignment/compare/stage-1...stage-2
@@ -83,13 +85,13 @@ Compare: https://github.com/Chuanhhua/sc2002_group_assignment/compare/stage-2...
 ### Modifications
 | File | Change | Reason |
 | --- | --- | --- |
-| ```Menu.java``` | ```addCombo()```, ```findItem()``` | Build a combo from two existing items |
+| ```Menu.java``` | ```addComboMeal()``` | Build a combo from two existing items |
 | ```Customer.java``` | ```recoverSatisfaction()``` | Happy Hour recovery, capped at 100 |
 | ```GameController.java``` | 4 menu slots; ```Host``` phase before the Waiter; Happy Hour start and end of turn; Happy Hour price in ```takeOrder()``` | Hooks for the three features; turn rules unchanged |
 | ```ConsoleUI.java``` | ```Host``` menu, ```HappyHour``` question and banner | Show the new choices |
 
 ### What still works
-- ```VIPCustomer``` and ```CriticCustomer``` behaviour unchanged: <check in the run>.
+- ```VIPCustomer``` and ```CriticCustomer``` behaviour unchanged.
 - Brief examples: Salad + Pasta combo = $24.30, 3 units; VIP Burger in Happy Hour = $10.80.
 - ```stage-1``` and ```stage-2``` tags still run their own test files.
 
