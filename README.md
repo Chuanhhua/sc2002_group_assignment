@@ -48,17 +48,17 @@ Compare: https://github.com/Chuanhhua/sc2002_group_assignment/compare/stage-1...
 | --- | --- |
 | ```src/VIPCustomer.java``` | A ```Customer``` that loses 5 satisfaction per waiting turn and pays 10% less (overrides ```getSatisfactionLossPerTurn()``` and ```calculateBill()```) |
 | ```src/CriticCustomer.java``` | A ```Customer``` that loses 12 satisfaction per waiting turn and always orders the most expensive dish (overrides ```chooseMenuItem()```) |
-| ```tests/stage2-victory.txt```, ```tests/stage2-defeat.txt``` | Reproducible Stage 2 runs. They replace the Stage 1 test files, which stay in the ```stage-1```. |
+| ```tests/stage2-victory.txt```, ```tests/stage2-defeat.txt``` | Reproducible Stage 2 runs. Each test file only replays at its own tag. |
 
 ### Modifications
 | File | Change | Reason |
 | --- | --- | --- |
 | ```Customer.java``` | Added ```getTypeName()```, ```chooseMenuItem()```, ```calculateBill()``` | Each ```Customer``` type decides its own dish and bill, so ```GameController``` needs no type checks (Brief 4.2) |
-| ```MenuItem.java``` | ```priceCents``` is now an ```int``` instead of a ```double``` | The VIP discount creates prices like $13.50; the brief asks for whole cents |
+| ```MenuItem.java``` | ```price``` (a ```double```) became ```priceCents``` (an ```int```) | The VIP discount creates prices like $13.50; the brief asks for whole cents |
 | ```Menu.java``` | ```addMenuItem()``` takes cents; new ```getMostExpensiveItem()``` | Money in cents; ```CriticCustomer``` ordering rule |
 | ```Order.java``` | Stores ```priceCents```, fixed when the order is taken | The bill now depends on who ordered |
 | ```GameController.java``` | ```VIPCustomer``` arrives on turn 4, ```CriticCustomer``` arrives on turn 7 (replaces two ```Customer``` arrivals); ```takeOrder()``` asks the customer for its dish and bill; revenue in cents | Brief 4.2 arrival rule; behaviour stays inside the customer objects |
-| ```ConsoleUI.java``` | ```money()``` ; shows each customer's type, e.g. "Customer 2 (VIP)" | Stores money in cents and shown as dolllars; the player can see who is a ```VIPCustomer``` or ```CriticCustomer``` |
+| ```ConsoleUI.java``` | ```money()``` ; shows each customer's type, e.g. "Customer 2 (VIP)" | Stores money in cents and shown as dollars; the player can see who is a ```VIPCustomer``` or ```CriticCustomer``` |
 
 No source files were deleted.
 
@@ -85,15 +85,17 @@ Compare: https://github.com/Chuanhhua/sc2002_group_assignment/compare/stage-2...
 ### Modifications
 | File | Change | Reason |
 | --- | --- | --- |
-| ```Menu.java``` | ```addComboMeal()``` | Build a combo from two existing items |
+| ```Menu.java``` | ```addComboMeal(first, second)``` | Build a combo from two existing items |
 | ```Customer.java``` | ```recoverSatisfaction()``` | Happy Hour recovery, capped at 100 |
-| ```GameController.java``` | 4 menu slots; ```Host``` phase before the Waiter; Happy Hour start and end of turn; Happy Hour price in ```takeOrder()``` | Hooks for the three features; turn rules unchanged |
-| ```ConsoleUI.java``` | ```Host``` menu, ```HappyHour``` question and banner | Show the new choices |
+| ```GameController.java``` | 4 menu slots; ```Host``` phase (```runHostPhase()```) before the Waiter; Happy Hour start (```runHappyHourStart()```) and end of turn (```happyHour.endTurn()```); Happy Hour price in ```takeOrder()``` (```happyHour.applyTo(...)```) | Hooks for the three features; turn rules unchanged |
+| ```ConsoleUI.java``` | ```Host``` menu (```askHostToSeat()```), ```HappyHour``` question (```askIfWantToStartHappyHour()```) and banner (```showHappyHourStatus()```) | Show the new choices |
+No source files were deleted. ```Order```, ```Table```, ```Task```, ```CriticCustomer``` and ```Game``` did not change (5 of the 11 Stage 2 classes).
 
 ### What still works
 - ```VIPCustomer``` and ```CriticCustomer``` behaviour unchanged.
 - Brief examples: Salad + Pasta combo = $24.30, 3 units; VIP Burger in Happy Hour = $10.80.
 - ```stage-1``` and ```stage-2``` tags still run their own test files.
+- At ```stage-3```: ```tests/stage3-victory.txt``` VICTORY with 5 paid, $78.78, average 84.8; ```tests/stage3-defeat.txt``` gives DEFEAT.
 
 ### Effect on the design
 ```ComboMeal``` is a ```MenuItem```, so ```Order```, the ```Chef``` and the ```Cashier``` handle combos with no change.
