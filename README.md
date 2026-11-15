@@ -112,8 +112,8 @@ Link: <video link>
 ## AI history
 | Member | Branch |
 | --- | --- |
-| Bryan | [https://github.com/Chuanhhua/sc2002_group_assignment/tree/<branch>/ai-history ](https://github.com/Chuanhhua/sc2002_group_assignment/tree/stage3_combomeal/ai-history)|
-| Caleb | https://github.com/Chuanhhua/sc2002_group_assignment/tree/<branch>/ai-history |
+| Bryan | [https://github.com/Chuanhhua/sc2002_group_assignment/tree/stage3_combomeal/ai-history](https://github.com/Chuanhhua/sc2002_group_assignment/tree/stage3_combomeal/ai-history)|
+| Caleb | [https://github.com/Chuanhhua/sc2002_group_assignment/tree/caleb/stage2/ai-history](https://github.com/Chuanhhua/sc2002_group_assignment/tree/caleb/stage2/ai-history) |
 | Chuanhua | https://github.com/Chuanhhua/sc2002_group_assignment/tree/<branch>/ai-history |
 | Xin Yi | https://github.com/Chuanhhua/sc2002_group_assignment/tree/<branch>/ai-history |
 | Zong Nan | https://github.com/Chuanhhua/sc2002_group_assignment/tree/<branch>/ai-history |
