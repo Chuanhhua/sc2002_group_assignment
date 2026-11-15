@@ -14,12 +14,14 @@ GitHub Repository: https://github.com/Chuanhhua/sc2002_group_assignment
 | Tang Zong Nan | ```ztang017``` |
 
 ## How to build and Run
-Needs Java 17 or newer. From the repository's top folder:
+Needs Java 17 or newer. 
+
+**From the repository's top folder**
 
     javac -d out src/*.java
     java -cp out Game
 
-Replay a recorded test run:
+**Replay a recorded test run**
 
     java -cp out Game < tests/stage3-victory.txt
 
