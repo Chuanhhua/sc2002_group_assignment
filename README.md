@@ -104,15 +104,18 @@ No source files were deleted. ```Order```, ```Table```, ```Task```, ```CriticCus
 ## Video
 Link: <video link>
 
-| # | Segment | Timestamp | Presenter |
-| --- | --- | --- | --- |
-| 1 | The game launching from the submitted project | 00:00–00:20 | Chuanhua |
-| 2 | Manager choices, including a decision where staff are limited | 02:00–03:00 | Chuanhua |
-| 3 | A dish going READY → SERVED → payment | 02:00–03:00 | Chuanhua |
-| 4 | A VIP or Critic behaviour | 03:00–04:00 | Caleb |
-| 5 | A Stage 3 feature (Host, combo or Happy Hour) | 04:00–05:45 | Zong Nan (Host and Happy Hour); Bryan (ComboMeal) |
-| 6 | One victory and one defeat (the recorded test runs) | 05:45–06:00 | Bryan |
-| 7 | The stage tag comparisons and the diagrams | 06:00–10:00 | Chuanhua, Caleb, Bryan, Zong Nan and Xin Yi |
+| Timestamp | Content | Speaker |
+| --- | --- | --- |
+| 00:00–01:45 | Introduction and game overview | Chuanhua |
+| 01:45–02:55 | Stage 1 gameplay | Bryan |
+| 03:00–03:45 | Stage 2 VIP and Critic | Caleb |
+| 03:45–06:16 | Stage 3 Host, ComboMeal, Happy Hour | Bryan |
+| 06:16–07:20 | Stage 1 class diagram | Chuanhua |
+| 07:20–08:35 | Stage 2 class diagram | Caleb |
+| 08:35–09:36 | Stage 3 class diagram | Zong Nan |
+| 09:36–10:50 | Design changes and GitHub evidence | Xin Yi |
+| 10:50–14:04 | Sequence diagram: VIP during Happy Hour | Zong Nan and Xin Yi |
+| 14:04–16:15 | Individual contributions and reflections | All five members |
 
 ## AI history
 | Member | Branch |
