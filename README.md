@@ -99,7 +99,7 @@ No source files were deleted. ```Order```, ```Table```, ```Task```, ```CriticCus
 - At ```stage-3```: ```tests/stage3-victory.txt``` VICTORY with 5 paid, $78.78, average 84.8; ```tests/stage3-defeat.txt``` gives DEFEAT.
 
 ### Effect on the design
-```ComboMeal``` is a ```MenuItem```, so ```Order```, the ```Chef``` and the ```Cashier``` handle combos with no change.
+```ComboMeal``` is a ```MenuItem```, so ```Order```, the Chef and the Cashier handle combos with no change.
 
 ## Video
 
@@ -116,7 +116,7 @@ No source files were deleted. ```Order```, ```Table```, ```Task```, ```CriticCus
 | 08:35–09:36 | Stage 3 class diagram | Zong Nan |
 | 09:36–10:50 | Design changes and GitHub evidence | Xin Yi |
 | 10:50–14:04 | Sequence diagram: VIP during Happy Hour | Zong Nan and Xin Yi |
-| 14:04–16:15 | Individual contributions and reflections | All five members |
+| 14:04–16:15 | Individual contributions and reflections | All Five Members |
 
 ## AI history
 | Member | Branch |
