@@ -106,13 +106,13 @@ Link: <video link>
 
 | # | Segment | Timestamp | Presenter |
 | --- | --- | --- | --- |
-| 1 | The game launching from the submitted project | 00:00 | |
-| 2 | Manager choices, including a decision where staff are limited | | |
-| 3 | A dish going READY → SERVED → payment | | |
-| 4 | A VIP or Critic behaviour | | |
-| 5 | A Stage 3 feature (Host, combo or Happy Hour) | | |
-| 6 | One victory and one defeat (the recorded test runs) | | |
-| 7 | The stage tag comparisons and the diagrams | | |
+| 1 | The game launching from the submitted project | 00:00–00:20 | Chuanhua |
+| 2 | Manager choices, including a decision where staff are limited | 02:00–03:00 | Chuanhua |
+| 3 | A dish going READY → SERVED → payment | 02:00–03:00 | Chuanhua |
+| 4 | A VIP or Critic behaviour | 03:00–04:00 | Caleb |
+| 5 | A Stage 3 feature (Host, combo or Happy Hour) | 04:00–05:45 | Zong Nan (Host and Happy Hour); Bryan (ComboMeal) |
+| 6 | One victory and one defeat (the recorded test runs) | 05:45–06:00 | Bryan |
+| 7 | The stage tag comparisons and the diagrams | 06:00–10:00 | Chuanhua, Caleb, Bryan, Zong Nan and Xin Yi |
 
 ## AI history
 | Member | Branch |
