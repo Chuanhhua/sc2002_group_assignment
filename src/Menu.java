@@ -3,21 +3,40 @@ import java.util.List;
 import java.util.Random;
 
 public class Menu {
-  private final Random random = new Random();
+  private static final long RANDOM_SEED = 2002;
+  private final Random random = new Random(RANDOM_SEED);// so that each run can be replayed
   private MenuItem[] menuItems;
 
   public Menu(int menuSize) {
     menuItems = new MenuItem[menuSize];
   }
 
-  public void addMenuItem(String name, double price, int preparationUnits) {
+  public void addMenuItem(String name, int priceCents, int preparationUnits) {
     // Add the menu item to the menuItems array
     for (int i = 0; i < menuItems.length; i++) {
       if (menuItems[i] == null && !doesItemExist(name)) {
-        menuItems[i] = new MenuItem(name, price, preparationUnits);
+        menuItems[i] = new MenuItem(name, priceCents, preparationUnits);
         break;
       }
     }
+  }
+  // returns false if the menu is full
+  // caller decides what to tell the player
+  public boolean addComboMeal(MenuItem firstItem, MenuItem secondItem) {
+    ComboMeal combo = new ComboMeal(firstItem, secondItem);
+
+    if (doesItemExist(combo.getItemName())) {
+        return true; // already on the menu
+    }
+
+    for (int i = 0; i < menuItems.length; i++) {
+        if (menuItems[i] == null) {
+            menuItems[i] = combo;
+            return true;
+        }
+    }
+
+    return false;
   }
 
   public MenuItem[] getMenuItems() {
@@ -36,6 +55,17 @@ public class Menu {
       return null;
     }
     return availableItems.get(random.nextInt(availableItems.size()));
+  }
+
+  // The highest-priced dish on the menu (CriticCustomer always orders this)
+  public MenuItem getMostExpensiveItem() {
+    MenuItem mostExpensive = null;
+    for (MenuItem item : menuItems) {
+      if (item != null && (mostExpensive == null || item.getPriceCents() > mostExpensive.getPriceCents())) {
+        mostExpensive = item;
+      }
+    }
+    return mostExpensive;
   }
 
   private boolean doesItemExist(String name) {
