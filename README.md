@@ -102,7 +102,8 @@ No source files were deleted. ```Order```, ```Table```, ```Task```, ```CriticCus
 ```ComboMeal``` is a ```MenuItem```, so ```Order```, the ```Chef``` and the ```Cashier``` handle combos with no change.
 
 ## Video
-Link: <video link>https://entuedu-my.sharepoint.com/:v:/g/personal/ng0024yi_e_ntu_edu_sg/IQAdOUOIDaz2RJtLhCB9FXewAc-wEtcb6QmNF7Ss3dYhgHc?e=e8Gb4w
+
+[Watch our SC2002 Restaurant Rush Presentation](https://entuedu-my.sharepoint.com/:v:/g/personal/ng0024yi_e_ntu_edu_sg/IQAdOUOIDaz2RJtLhCB9FXewAc-wEtcb6QmNF7Ss3dYhgHc?e=e8Gb4w)
 
 | Timestamp | Content | Speaker |
 | --- | --- | --- |
