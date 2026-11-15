@@ -120,5 +120,5 @@ Link: <video link>
 | Bryan | [https://github.com/Chuanhhua/sc2002_group_assignment/tree/stage3_combomeal/ai-history](https://github.com/Chuanhhua/sc2002_group_assignment/tree/stage3_combomeal/ai-history)|
 | Caleb | [https://github.com/Chuanhhua/sc2002_group_assignment/tree/caleb/stage2/ai-history](https://github.com/Chuanhhua/sc2002_group_assignment/tree/caleb/stage2/ai-history) |
 | Chuanhua | [https://github.com/Chuanhhua/sc2002_group_assignment/tree/chuan/feat/finalize-stage-1/ai-history](https://github.com/Chuanhhua/sc2002_group_assignment/tree/chuan/feat/finalize-stage-1/ai-history) |
-| Xin Yi | [https://github.com/Chuanhhua/sc2002_group_assignment/blob/xinyi/ai-history/ai-history/SC2002_AI_Declaration_XinYi.pdf](https://github.com/Chuanhhua/sc2002_group_assignment/blob/xinyi/ai-history/ai-history/SC2002_AI_Declaration_XinYi.pdf) |
+| Xin Yi | [https://github.com/Chuanhhua/sc2002_group_assignment/blob/xinyi/ai-history/ai-history/AI_HISTORY_XINYI.pdf](https://github.com/Chuanhhua/sc2002_group_assignment/blob/xinyi/ai-history/ai-history/AI_HISTORY_XINYI.pdf) |
 | Zong Nan | [https://github.com/Chuanhhua/sc2002_group_assignment/tree/main/ai-history/stage-3](https://github.com/Chuanhhua/sc2002_group_assignment/tree/main/ai-history/stage-3) |
