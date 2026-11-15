@@ -89,6 +89,7 @@ Compare: https://github.com/Chuanhhua/sc2002_group_assignment/compare/stage-2...
 | ```Customer.java``` | ```recoverSatisfaction()``` | Happy Hour recovery, capped at 100 |
 | ```GameController.java``` | 4 menu slots; ```Host``` phase (```runHostPhase()```) before the Waiter; Happy Hour start (```runHappyHourStart()```) and end of turn (```happyHour.endTurn()```); Happy Hour price in ```takeOrder()``` (```happyHour.applyTo(...)```) | Hooks for the three features; turn rules unchanged |
 | ```ConsoleUI.java``` | ```Host``` menu (```askHostToSeat()```), ```HappyHour``` question (```askIfWantToStartHappyHour()```) and banner (```showHappyHourStatus()```) | Show the new choices |
+
 No source files were deleted. ```Order```, ```Table```, ```Task```, ```CriticCustomer``` and ```Game``` did not change (5 of the 11 Stage 2 classes).
 
 ### What still works
