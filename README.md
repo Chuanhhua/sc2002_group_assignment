@@ -33,7 +33,7 @@ Replay a recorded test run:
 ## Rules chosen by our Group
 | Objects Involved | Rule |
 | --- | --- |
-| Seed | Dishes are picked with new Random(2002), such that the nth order is always the same dish. |
+| Seed | Dishes are picked with ```new Random(2002)```, such that the nth order is always the same dish. |
 | ```CriticCustomer``` | Always orders the most expensive item on the menu. |
 | ```ComboMeal``` | Salad + Pasta, built from two items already on the menu so its price follows theirs: 90% of their combined price ($24.30) and their prep units added (3). The Critic always orders it as the most expensive item. |
 | ```Host``` | Acts before the waiter, such that the customer it seats can order within the same turn. |
